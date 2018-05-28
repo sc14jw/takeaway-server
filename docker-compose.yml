@@ -1,0 +1,19 @@
+version: "3"
+services:
+
+  web:
+    image: jackwainwright96/takeaway:0.1
+    deploy:
+      replicas: 1
+      resources:
+        limits: "0.3"
+        memory: 1000M
+      restart_policy:
+        condition: "on-failure"
+      ports:
+        -"80:80"
+      networks:
+        - webnet
+
+networks:
+  webnet:
