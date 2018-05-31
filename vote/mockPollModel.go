@@ -2,6 +2,7 @@ package vote
 
 import (
 	"fmt"
+	"strconv"
 	"takeaway/takeaway-server/restaurant"
 )
 
@@ -43,5 +44,31 @@ func (pm *MockPollModel) GetPoll(id string) (poll *Poll, err error) {
 		}
 	}
 	poll = pm.p
+	return
+}
+
+// NewPoll creates a new poll returning the created poll. This poll is used as the saved poll for the mock. An error will be returned from this method should the first option name passed be "unknown", returning nil
+// for the returned poll.
+func (pm *MockPollModel) NewPoll(options []string) (poll *Poll, err error) {
+	if options[0] == "unknown" {
+		err = fmt.Errorf("the specified option %s is invalid", options[0])
+		return
+	}
+
+	opts := make([]*restaurant.Building, 0)
+	for i, name := range options {
+		opts = append(opts, &restaurant.Building{
+			ID:   "r" + strconv.Itoa(i),
+			Name: name,
+		})
+	}
+
+	poll = &Poll{
+		ID:      "new poll",
+		Options: opts,
+	}
+
+	pm.p = poll
+
 	return
 }

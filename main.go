@@ -16,7 +16,20 @@ func main() {
 	vote.Init(voteCtx)
 
 	r := mux.NewRouter().StrictSlash(true)
-	r.HandleFunc("/vote", vote.GetVote)
+	r.HandleFunc("/vote", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			vote.GetVote(w, r)
+			return
+		case http.MethodPut:
+			vote.NewVote(w, r)
+			return
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+	})
 
 	fmt.Println("Starting server on port 8080. Press ctrl + C to stop it.......")
 
