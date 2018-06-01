@@ -1,6 +1,6 @@
 package vote
 
-import "takeaway/takeaway-server/restaurant"
+import "takeaway/takeaway-server/internal/restaurant"
 
 // Poll represents a singular vote within the system.
 type Poll struct {

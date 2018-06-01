@@ -3,7 +3,8 @@ package vote
 import (
 	"fmt"
 	"strconv"
-	"takeaway/takeaway-server/restaurant"
+
+	"takeaway/takeaway-server/internal/restaurant"
 )
 
 var r1 = &restaurant.Building{

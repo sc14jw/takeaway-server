@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"takeaway/takeaway-server/vote"
+	"takeaway/takeaway-server/internal/vote"
 
 	"github.com/facebookgo/inject"
 	"github.com/gorilla/mux"

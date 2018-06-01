@@ -1,8 +1,9 @@
 package vote
 
 import (
-	"takeaway/takeaway-server/restaurant"
 	"testing"
+
+	"takeaway/takeaway-server/internal/restaurant"
 )
 
 var (
