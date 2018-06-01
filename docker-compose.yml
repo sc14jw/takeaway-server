@@ -2,7 +2,7 @@ version: "3"
 services:
 
   web:
-    image: jackwainwright96/takeaway:0.1
+    image: jackwainwright96/takeaway:latest
     deploy:
       replicas: 1
       resources:
