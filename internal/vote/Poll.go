@@ -4,9 +4,9 @@ import "takeaway/takeaway-server/internal/restaurant"
 
 // Poll represents a singular vote within the system.
 type Poll struct {
-	ID      string                 `json:"id"`
-	Votes   map[string][]string    `json:"votes"`
-	Options []*restaurant.Building `json:"options"`
+	ID      string                 `json:"id" bson:"id"`
+	Votes   map[string][]string    `json:"votes" bson:"votes"`
+	Options []*restaurant.Building `json:"options" bson:"options"`
 }
 
 // AddOption allows for a restaurant to be added to the poll object.

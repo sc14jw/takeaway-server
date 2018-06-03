@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"takeaway/takeaway-server/internal/restaurant"
 )
 
 const (
@@ -32,11 +33,19 @@ func GetVote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	md := instance.Model
-	poll, err := md.GetPoll(id)
+	poll, status, err := md.GetPoll(id)
 
 	// if a poll with the given id could not be found return a status not found response.
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		log.Printf("Error = %s\n", err.Error())
+		log.Printf("Status = %v\n", status)
+		if status == NotFound {
+			log.Printf("Could not find ID %s, returning not found exception.\n", id)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			log.Printf("Unable to find ID due to being unable to connect to the DB.\n")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -44,6 +53,7 @@ func GetVote(w http.ResponseWriter, r *http.Request) {
 
 	// if poll could not be serialized to JSON, return an internal server error.
 	if err != nil {
+		log.Printf("The poll %v could not be serialised to JSON.\n", poll)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -70,7 +80,7 @@ func NewVote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var data newVoteData
+	var data []*restaurant.Building
 	err = json.Unmarshal(b, &data)
 
 	// if request could not be properly unmarchelled, return a bad request status to the client.
@@ -81,10 +91,14 @@ func NewVote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	md := instance.Model
-	poll, err := md.NewPoll(data.Options)
+	poll, status, err := md.NewPoll(data)
 
 	if err != nil {
-		http.Error(w, "Poll could not be created", http.StatusInternalServerError)
+		if status == Invalid {
+			http.Error(w, "Supplied options invalid", http.StatusBadRequest)
+		} else {
+			http.Error(w, "Poll could not be created", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -100,8 +114,4 @@ func NewVote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write(rtnString)
 	return
-}
-
-type newVoteData struct {
-	Options []string `json:"options"`
 }
