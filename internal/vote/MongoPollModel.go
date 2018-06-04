@@ -68,6 +68,24 @@ func (pm *MongoPollModel) NewPoll(options []*restaurant.Building) (poll *Poll, s
 	return
 }
 
+// UpdatePoll allows a poll stored within the mongo database to be updated with the contents of the specified Poll object.
+func (pm *MongoPollModel) UpdatePoll(p *Poll) (status Status, err error) {
+	err = pm.openSessionIfRequired()
+	if err != nil {
+		status = NoConnection
+		return
+	}
+
+	c := pm.session.DB(pm.DBName).C("polls")
+	err = c.Update(bson.M{"id": p.ID}, p)
+	if err != nil {
+		status = NotFound
+		return
+	}
+
+	return
+}
+
 // Close allows the model to be closed properly, ensuring any mongo sessions are properly closed.
 func (pm *MongoPollModel) Close() (err error) {
 	err = pm.Close()

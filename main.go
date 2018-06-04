@@ -41,10 +41,13 @@ func main() {
 	r.HandleFunc("/poll", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			vote.GetVote(w, r)
+			vote.GetPoll(w, r)
 			return
 		case http.MethodPut:
-			vote.NewVote(w, r)
+			vote.NewPoll(w, r)
+			return
+		case http.MethodPost:
+			vote.UpdatePoll(w, r)
 			return
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)

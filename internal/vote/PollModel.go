@@ -14,6 +14,9 @@ type PollModel interface {
 	// NewPoll allows for a new poll to be created, given a slice of options. Should a poll be able to be created properly a pointer to said poll will be returned. Should an error occur while
 	// creating a poll, an error should be returned with the returned poll being nil.
 	NewPoll(options []*restaurant.Building) (*Poll, Status, error)
+	// UpdatePoll takes a Poll object as an argument representing the updated state of a poll. This Poll object will be used to update the currently stored poll. Any errors that occur while
+	// attempting to update the poll object will be returned by the function. A status is also returned by the function specifying the status of the update action.
+	UpdatePoll(p *Poll) (Status, error)
 	// Close allows for a PollModel connection to be closed.
 	Close() error
 }

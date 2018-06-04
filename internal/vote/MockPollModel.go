@@ -67,6 +67,18 @@ func (pm *MockPollModel) NewPoll(options []*restaurant.Building) (poll *Poll, st
 	return
 }
 
+// UpdatePoll updates the mock's stored Poll object with the given updated Poll object. Should the passed Poll have an ID of 'unknown' an error will be returned with an 'NotFound' status.
+func (pm *MockPollModel) UpdatePoll(p *Poll) (status Status, err error) {
+	if p.ID == "unknown" {
+		err = fmt.Errorf("the id %s could not be found", p.ID)
+		status = NotFound
+		return
+	}
+
+	pm.p = p
+	return
+}
+
 // Close has been added to ensure the mock meets the PollModel interface, it does not need to actually complete anything.
 func (pm *MockPollModel) Close() (err error) {
 	return

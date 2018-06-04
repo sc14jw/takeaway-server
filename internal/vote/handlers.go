@@ -13,8 +13,8 @@ const (
 	unknownIDError = "The given ID %s cannot be found."
 )
 
-// GetVote provides a http handler for accessing a specified vote.
-func GetVote(w http.ResponseWriter, r *http.Request) {
+// GetPoll provides a http handler for accessing a specified vote.
+func GetPoll(w http.ResponseWriter, r *http.Request) {
 	log.Println("Recieved request")
 
 	// if no ids have been specified within the request, return a bad request status.
@@ -68,8 +68,8 @@ func GetVote(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// NewVote provides a http handler for creating a new vote.
-func NewVote(w http.ResponseWriter, r *http.Request) {
+// NewPoll provides a http handler for creating a new vote.
+func NewPoll(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 
@@ -114,4 +114,45 @@ func NewVote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write(rtnString)
 	return
+}
+
+// UpdatePoll allows for a poll within the system to be updated.
+func UpdatePoll(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+
+	// if the body could not be parsed, return an internal server error to the client
+	if err != nil {
+		log.Println("Could not read body of request")
+		http.Error(w, "Could not parse request", http.StatusInternalServerError)
+		return
+	}
+
+	var data Poll
+	err = json.Unmarshal(b, &data)
+
+	// if data cannot be unmarshalled to a Poll object, return a bad request status to the client.
+	if err != nil {
+		log.Printf("Could not unmarshal passed data into a Poll object data = %s\n", b)
+		http.Error(w, "Could not parse request", http.StatusBadRequest)
+		return
+	}
+
+	md := instance.Model
+	status, err := md.UpdatePoll(&data)
+
+	if err != nil {
+		if status == NotFound {
+			log.Printf("Could not find a poll with specified ID = %s\n", data.ID)
+			http.Error(w, "Could not find poll with specified ID", http.StatusBadRequest)
+			return
+		} else {
+			log.Printf("Could not update poll with id %s due to internal model error %s\n", data.ID, err.Error())
+			http.Error(w, "Could not update poll", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	log.Printf("successfully updated poll with id %s\n", data.ID)
+	w.WriteHeader(http.StatusAccepted)
 }
