@@ -38,7 +38,7 @@ func main() {
 	vote.Init(voteCtx)
 
 	r := mux.NewRouter().StrictSlash(true)
-	r.HandleFunc("/vote", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/poll", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			vote.GetVote(w, r)

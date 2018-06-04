@@ -10,12 +10,15 @@ import (
 
 var sessionMutex = &sync.Mutex{}
 
+// MongoPollModel provides a mongo based implementation to the PollModel interface.
 type MongoPollModel struct {
 	session *mgo.Session
 	DBName  string
 	URL     string
 }
 
+// GetPoll gets a poll from the mongo database with the specified id, returning the found poll as a Poll object, a status
+// and an error should any issues occur while trying to return the specified poll.
 func (pm *MongoPollModel) GetPoll(id string) (poll *Poll, status Status, err error) {
 	err = pm.openSessionIfRequired()
 	if err != nil {
@@ -38,6 +41,8 @@ func (pm *MongoPollModel) GetPoll(id string) (poll *Poll, status Status, err err
 	return
 }
 
+// NewPoll creates a new poll within the mongo database, returning the created Poll object with a status and any errors
+// that occur while attempting to create the poll.
 func (pm *MongoPollModel) NewPoll(options []*restaurant.Building) (poll *Poll, status Status, err error) {
 	err = pm.openSessionIfRequired()
 	if err != nil {
@@ -63,6 +68,7 @@ func (pm *MongoPollModel) NewPoll(options []*restaurant.Building) (poll *Poll, s
 	return
 }
 
+// Close allows the model to be closed properly, ensuring any mongo sessions are properly closed.
 func (pm *MongoPollModel) Close() (err error) {
 	err = pm.Close()
 	return
