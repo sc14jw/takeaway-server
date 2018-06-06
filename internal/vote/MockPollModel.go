@@ -79,6 +79,18 @@ func (pm *MockPollModel) UpdatePoll(p *Poll) (status Status, err error) {
 	return
 }
 
+// DeletePoll removes the mock's stored Poll Object. Should the passed id equal 'unknown' an error will be returned along with a 'NotFound' status.
+func (pm *MockPollModel) DeletePoll(id string) (status Status, err error) {
+	if id == "unknown" {
+		err = fmt.Errorf("the id %s could not be found", id)
+		status = NotFound
+		return
+	}
+
+	pm.p = nil
+	return
+}
+
 // Close has been added to ensure the mock meets the PollModel interface, it does not need to actually complete anything.
 func (pm *MockPollModel) Close() (err error) {
 	return

@@ -42,16 +42,14 @@ func main() {
 		switch r.Method {
 		case http.MethodGet:
 			vote.GetPoll(w, r)
-			return
 		case http.MethodPut:
 			vote.NewPoll(w, r)
-			return
 		case http.MethodPost:
 			vote.UpdatePoll(w, r)
-			return
+		case http.MethodDelete:
+			vote.DeletePoll(w, r)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
 		}
 
 	})

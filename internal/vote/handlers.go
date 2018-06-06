@@ -146,13 +146,46 @@ func UpdatePoll(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Could not find a poll with specified ID = %s\n", data.ID)
 			http.Error(w, "Could not find poll with specified ID", http.StatusBadRequest)
 			return
-		} else {
-			log.Printf("Could not update poll with id %s due to internal model error %s\n", data.ID, err.Error())
-			http.Error(w, "Could not update poll", http.StatusInternalServerError)
-			return
 		}
+
+		log.Printf("Could not update poll with id %s due to internal model error %s\n", data.ID, err.Error())
+		http.Error(w, "Could not update poll", http.StatusInternalServerError)
+		return
 	}
 
 	log.Printf("successfully updated poll with id %s\n", data.ID)
 	w.WriteHeader(http.StatusAccepted)
+}
+
+// DeletePoll allows for a poll to be removed from the system.
+func DeletePoll(w http.ResponseWriter, r *http.Request) {
+	// if no ids have been specified within the request, return a bad request status.
+	if len(r.URL.Query()["id"]) == 0 {
+		log.Println("No ID specified. Returning bad request status.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	id := r.URL.Query()["id"][0]
+	// if no id is specified as a query parameter, return a bad request status.
+	if id == "" {
+		log.Println("Empty ID specified. Returning bad request status.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	md := instance.Model
+	status, err := md.DeletePoll(id)
+
+	if err != nil {
+		if status == NotFound {
+			// if the given ID could not be found within the datasource return a not found status.
+			log.Printf("Could not find the ID %s\n", id)
+			http.Error(w, "ID not found", http.StatusNotFound)
+		} else {
+			// otherwise return an internal server error status.
+			http.Error(w, "Could not deal with request", http.StatusInternalServerError)
+		}
+		return
+	}
 }

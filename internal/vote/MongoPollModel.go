@@ -80,7 +80,23 @@ func (pm *MongoPollModel) UpdatePoll(p *Poll) (status Status, err error) {
 	err = c.Update(bson.M{"id": p.ID}, p)
 	if err != nil {
 		status = NotFound
+	}
+
+	return
+}
+
+func (pm *MongoPollModel) DeletePoll(id string) (status Status, err error) {
+	err = pm.openSessionIfRequired()
+	if err != nil {
+		status = NoConnection
 		return
+	}
+
+	c := pm.session.DB(pm.DBName).C("polls")
+	err = c.Remove(bson.M{"id": id})
+
+	if err != nil {
+		status = NotFound
 	}
 
 	return

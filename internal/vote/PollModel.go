@@ -17,6 +17,9 @@ type PollModel interface {
 	// UpdatePoll takes a Poll object as an argument representing the updated state of a poll. This Poll object will be used to update the currently stored poll. Any errors that occur while
 	// attempting to update the poll object will be returned by the function. A status is also returned by the function specifying the status of the update action.
 	UpdatePoll(p *Poll) (Status, error)
+	// DeletePoll attempts to delete a poll from the system with the corresponding passed ID. A status will be returned detailing the status of the operation along with any errors that occur while
+	// attempting to delete the given ID.
+	DeletePoll(id string) (Status, error)
 	// Close allows for a PollModel connection to be closed.
 	Close() error
 }
