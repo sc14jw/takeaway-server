@@ -51,7 +51,14 @@ func main() {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
-
+	})
+	r.HandleFunc("/vote", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			vote.AddVote(w, r)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	})
 
 	fmt.Println("Starting server on port 8080. Press ctrl + C to stop it.......")
