@@ -199,6 +199,7 @@ func DeletePoll(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AddVote provides http handler for adding a vote to a poll.
 func AddVote(w http.ResponseWriter, r *http.Request) {
 	// if no ids have been specified within the request, return a bad request status.
 	if len(r.URL.Query()["id"]) == 0 {
@@ -217,14 +218,8 @@ func AddVote(w http.ResponseWriter, r *http.Request) {
 
 	md := instance.Model
 
-	lock, found := pollLocks.Load(id)
-	if !found {
-		lock = &sync.Mutex{}
-		pollLocks.Store(id, lock)
-	}
-
-	lock.(*sync.Mutex).Lock()
-	defer lock.(*sync.Mutex).Unlock()
+	lock := lockPoll(id)
+	defer lock.Unlock()
 
 	poll, status, err := md.GetPoll(id)
 
@@ -267,15 +262,31 @@ func AddVote(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if status == NotFound {
+			// if the specified poll ID could not be found, return a not found status.
 			log.Printf("Could not update poll due to not finding the id %s\n", id)
 			http.Error(w, "Could not find poll with specified ID", http.StatusNotFound)
 		} else {
+			// otherwise return an internal server error status.
 			log.Printf("Could not update poll %s due to being unable to connect to the database\n", id)
-			http.Error(w, "Could not update poll", http.StatusBadRequest)
+			http.Error(w, "Could not update poll", http.StatusInternalServerError)
 		}
 		return
 	}
 
 	log.Printf("Updated poll %s with a vote for %s for user %s\n", id, data.ResID, data.User)
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func lockPoll(id string) (lock *sync.Mutex) {
+	l, found := pollLocks.Load(id)
+
+	if !found {
+		lock = &sync.Mutex{}
+		pollLocks.Store(id, lock)
+	} else {
+		lock = l.(*sync.Mutex)
+	}
+
+	lock.Lock()
+	return
 }
