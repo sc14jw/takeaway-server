@@ -277,6 +277,7 @@ func AddVote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
+// RemoveUser provides a http handler for removing a user from a specified poll.
 func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	// if no ids have been specified within the request, return a bad request status.
 	if len(r.URL.Query()["id"]) == 0 {
