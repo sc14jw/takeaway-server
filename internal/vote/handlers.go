@@ -277,6 +277,75 @@ func AddVote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
+func RemoveUser(w http.ResponseWriter, r *http.Request) {
+	// if no ids have been specified within the request, return a bad request status.
+	if len(r.URL.Query()["id"]) == 0 {
+		log.Println("No ID specified. Returning bad request status.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	id := r.URL.Query()["id"][0]
+	// if no id is specified as a query parameter, return a bad request status.
+	if id == "" {
+		log.Println("Empty ID specified. Returning bad request status.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// if no user has been specified within the request, return a bad request status.
+	if len(r.URL.Query()["user"]) == 0 {
+		log.Println("No User specified. Returning bad request status.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	user := r.URL.Query()["user"][0]
+	// if no user is specified as a query parameter, return a bad request status.
+	if user == "" {
+		log.Println("Empty User specified. Returning bad request status.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	md := instance.Model
+
+	log.Printf("attempting to remove user %s from poll %s\n", user, id)
+
+	lock := lockPoll(id)
+	defer lock.Unlock()
+
+	poll, status, err := md.GetPoll(id)
+	if err != nil {
+		if status == NotFound {
+			// if the given ID cannot be found, return a not found response.
+			log.Printf("A poll with the given ID %s could not be found within the system\n", id)
+			http.Error(w, "poll with the given ID cannot be found", http.StatusNotFound)
+		} else {
+			// otherwise a connection could not be created with the datasource
+			log.Printf("Could not connect to the datasource to remove user.\n")
+			http.Error(w, "User could not be removed from the Poll", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	poll.ClearVotesFor(user)
+
+	status, err = md.UpdatePoll(poll)
+	if err != nil {
+		// if an error occurs while updating the poll, return an internal server error status.
+		log.Printf("Could not update poll with ID %s\n", id)
+		http.Error(w, "Could not update poll", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Removed user %s from poll %s\n", user, id)
+
+	w.WriteHeader(http.StatusAccepted)
+	return
+
+}
+
 func lockPoll(id string) (lock *sync.Mutex) {
 	l, found := pollLocks.Load(id)
 

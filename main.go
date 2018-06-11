@@ -56,6 +56,8 @@ func main() {
 		switch r.Method {
 		case http.MethodPost:
 			vote.AddVote(w, r)
+		case http.MethodDelete:
+			vote.RemoveUser(w, r)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
