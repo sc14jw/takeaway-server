@@ -21,6 +21,9 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    deploy:
+      placement:
+        constraints: [node.role == manager]
 
   mongo-express:
     image: mongo-express

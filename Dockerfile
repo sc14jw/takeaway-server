@@ -8,5 +8,5 @@ RUN go get "gopkg.in/mgo.v2/bson"
 
 RUN go install takeaway/takeaway-server
 
-ENTRYPOINT [ "/go/bin/takeaway-server" ]
+ENTRYPOINT [ "/go/bin/takeaway-server", "-mongoHost", "mongo", "-mongoPort", "8081"]
 EXPOSE 8080
