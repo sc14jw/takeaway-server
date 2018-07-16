@@ -103,6 +103,7 @@ func NewPoll(w http.ResponseWriter, r *http.Request) {
 	poll, status, err := md.NewPoll(data)
 
 	if err != nil {
+		log.Printf("Could not create a new poll due to: %s\n", err.Error())
 		if status == Invalid {
 			http.Error(w, "Supplied options invalid", http.StatusBadRequest)
 		} else {

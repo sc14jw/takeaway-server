@@ -12,9 +12,11 @@ var sessionMutex = &sync.Mutex{}
 
 // MongoPollModel provides a mongo based implementation to the PollModel interface.
 type MongoPollModel struct {
-	session *mgo.Session
-	DBName  string
-	URL     string
+	session  *mgo.Session
+	DBName   string
+	URL      string
+	Username string
+	Password string
 }
 
 // GetPoll gets a poll from the mongo database with the specified id, returning the found poll as a Poll object, a status
@@ -85,6 +87,8 @@ func (pm *MongoPollModel) UpdatePoll(p *Poll) (status Status, err error) {
 	return
 }
 
+// DeletePoll removes a specified poll from the mongo database. A status is returned detailing the status of the completed deletion, defaulting to Ok. Any errors
+// occuring while deleting the specified poll are also returned.
 func (pm *MongoPollModel) DeletePoll(id string) (status Status, err error) {
 	err = pm.openSessionIfRequired()
 	if err != nil {
@@ -109,10 +113,19 @@ func (pm *MongoPollModel) Close() (err error) {
 }
 
 func (pm *MongoPollModel) openSessionIfRequired() (err error) {
-	sessionMutex.Lock()
 	if pm.session == nil {
-		pm.session, err = mgo.Dial(pm.URL)
+		sessionMutex.Lock()
+		defer sessionMutex.Unlock()
+		if pm.session == nil {
+			pm.session, err = mgo.Dial(pm.URL)
+			if err != nil {
+				return
+			}
+
+			if pm.Username != "" && pm.Password != "" {
+				err = pm.session.Login(&mgo.Credential{Username: pm.Username, Password: pm.Password})
+			}
+		}
 	}
-	sessionMutex.Unlock()
 	return
 }

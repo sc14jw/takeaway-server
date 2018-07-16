@@ -12,7 +12,10 @@ services:
       restart_policy:
         condition: "on-failure"
     ports:
-      - "80:80"
+      - "8080:8080"
+    environment:
+      Username: root
+      Password: example
     networks:
       - webnet
 
@@ -22,9 +25,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-    deploy:
-      placement:
-        constraints: [node.role == manager]
+    networks: 
+      - webnet
 
   mongo-express:
     image: mongo-express
@@ -34,6 +36,8 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    networks: 
+      - webnet
 
 networks:
   webnet:
