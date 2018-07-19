@@ -10,9 +10,10 @@ RUN go install takeaway/takeaway-server
 
 ARG Username="test"
 ARG Password="test"
+ARG Host="mongo"
 
 RUN echo "Password = " ${Password}
 RUN echo "Username = " ${Username}
 
-ENTRYPOINT /go/bin/takeaway-server -mongoHost mongo -mongoUsername ${Password} -mongoPassword ${Username}
+ENTRYPOINT /go/bin/takeaway-server -mongoHost mongo -mongoUsername root -mongoPassword example
 EXPOSE 8080
