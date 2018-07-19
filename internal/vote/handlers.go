@@ -258,6 +258,12 @@ func AddVote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if data.User == "" || data.ResID == "" {
+		log.Printf("Data missing from supplied vote object %v\n", data)
+		http.Error(w, "Could not parse given vote", http.StatusBadRequest)
+		return
+	}
+
 	poll.AddVote(data.ResID, data.User)
 	status, err = md.UpdatePoll(poll)
 
