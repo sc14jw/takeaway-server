@@ -15,5 +15,5 @@ ARG Host="mongo"
 RUN echo "Password = " ${Password}
 RUN echo "Username = " ${Username}
 
-ENTRYPOINT /go/bin/takeaway-server -mongoHost mongo -mongoUsername root -mongoPassword example
+ENTRYPOINT /go/bin/takeaway-server -mongoHost "${Host}" -mongoUsername "${Username}" -mongoPassword "${Password}"
 EXPOSE 8080
