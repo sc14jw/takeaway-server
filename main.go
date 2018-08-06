@@ -10,6 +10,7 @@ import (
 
 	"github.com/facebookgo/inject"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 var (
@@ -72,5 +73,6 @@ func main() {
 
 	fmt.Println("Starting server on port 8080. Press ctrl + C to stop it.......")
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	handler := cors.Default().Handler(r)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
