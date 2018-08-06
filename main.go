@@ -73,6 +73,9 @@ func main() {
 
 	fmt.Println("Starting server on port 8080. Press ctrl + C to stop it.......")
 
-	handler := cors.Default().Handler(r)
+	handler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	}).Handler(r)
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }
