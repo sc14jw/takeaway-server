@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"takeaway/takeaway-server/internal/vote"
+	"takeaway/takeaway-server/internal/websocket"
 
 	"github.com/facebookgo/inject"
 	"github.com/gorilla/mux"
@@ -45,6 +46,9 @@ func main() {
 
 	vote.Init(voteCtx)
 
+	hub := websocket.NewHub()
+	go hub.Run()
+
 	r := mux.NewRouter().StrictSlash(true)
 	r.HandleFunc("/poll", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -69,6 +73,9 @@ func main() {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
+	})
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		websocket.HandleWs(hub, w, r)
 	})
 
 	fmt.Println("Starting server on port 8080. Press ctrl + C to stop it.......")
