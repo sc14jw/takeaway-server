@@ -46,7 +46,7 @@ func main() {
 
 	vote.Init(voteCtx)
 
-	hub := websocket.NewHub()
+	hub := websocket.HubInstance
 	go hub.Run()
 
 	r := mux.NewRouter().StrictSlash(true)

@@ -6,6 +6,9 @@ import (
 	"takeaway/takeaway-server/internal/vote"
 )
 
+// HubInstance is a singleton instance of the Hub struct.
+var HubInstance = newHub()
+
 // Hub provides a collection for managing all websocket connections to the server,
 // based off https://github.com/gorilla/websocket/blob/master/examples/chat/hub.go.
 type Hub struct {
@@ -53,12 +56,17 @@ func (h *Hub) delete(client *Client) {
 	close(client.send)
 }
 
-// NewHub create a brand new Hub objecct instance, returning a pointer to said instance.
-func NewHub() *Hub {
+// newHub create a brand new Hub objecct instance, returning a pointer to said instance.
+func newHub() *Hub {
 	return &Hub{
 		Broadcast:  make(chan *vote.Poll),
 		clients:    make(map[string][]*Client),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 	}
+}
+
+// NotifyChange is a utility method allowing an updated poll object to be broadcasted using the HubInstance.
+func NotifyChange(p *vote.Poll) {
+	HubInstance.Broadcast <- p
 }

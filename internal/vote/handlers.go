@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sync"
 	"takeaway/takeaway-server/internal/restaurant"
+	"takeaway/takeaway-server/internal/websocket"
 )
 
 const (
@@ -164,6 +165,7 @@ func UpdatePoll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("successfully updated poll with id %s\n", data.ID)
+	websocket.NotifyChange(&data)
 	w.WriteHeader(http.StatusAccepted)
 }
 
@@ -281,6 +283,7 @@ func AddVote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Updated poll %s with a vote for %s for user %s\n", id, data.ResID, data.User)
+	websocket.NotifyChange(poll)
 	w.WriteHeader(http.StatusAccepted)
 }
 
